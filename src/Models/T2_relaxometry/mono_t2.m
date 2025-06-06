@@ -117,6 +117,10 @@ end
                  
                 end
                 
+                %fix data type errors for lsqnonlin
+                xData = double(xData);
+                yDat = double(yDat);
+
                 %xData = xData';
                 
                 if obj.options.OffsetTerm
@@ -126,16 +130,22 @@ end
                 end
                 
                 yDat = abs(yDat);
-                yDat = yDat./max(yDat);
-                
+                %yDat = yDat./max(yDat);
+                yDat = yDat./(max(yDat) + eps); 
+
                 % T2 initialization adapted from
                 % https://github.com/blemasso/FLI_pipeline_T2/blob/master/matlab/pipeline_T2.m
-                
-                t2Init_dif = xData(1) - xData(end-1);
-                t2Init = t2Init_dif/log(yDat(end-1)/yDat(1));
-                
+                try
+                    t2Init_dif = double(xData(1) - xData(end-1));
+                    t2Init = t2Init_dif/double(log(double(yDat(end-1)/yDat(1))));  %this result in a divide by zero error, should it or should it just use the defualt value?
+                catch err
+                    t2Init = 0; %set it to a non-zero value to try and continue
+                end
+
+
                 if t2Init<=0 || isnan(t2Init),
                     t2Init=30;
+                    warning("t2Init failed in fit() for mono_t2, using default value of 30");
                 end
                 
                 pdInit = max(yDat(:))*1.5;
@@ -147,7 +157,7 @@ end
                 if obj.options.OffsetTerm
                     fit_out = lsqnonlin(fT2,[pdInit t2Init 0],[obj.lb(2), obj.lb(1)],[obj.ub(2), obj.ub(1)],options);
                 else
-                    fit_out = lsqnonlin(fT2,[pdInit t2Init],[obj.lb(2) obj.lb(1)],[obj.ub(2) obj.ub(1)],options);
+                    fit_out = lsqnonlin(fT2,double([pdInit t2Init]),[obj.lb(2) obj.lb(1)],[obj.ub(2) obj.ub(1)],options);
                 end
 
                 
