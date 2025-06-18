@@ -51,6 +51,7 @@ if FitResults.Model.voxelwise
     hold(hmap_axis, 'off')
     % move windows
     hplot = figure();
+    hplot_axes = gca;
     CurrentPos = get(hplot, 'Position');
     MapPos = get(hmap, 'Position');
     MapPos(1) = max(1,MapPos(1)-round(MapPos(3)/2));
@@ -82,6 +83,7 @@ function voxelClickCallback(src, event)
         % Plot the new voxel curve in the plot figure
         % Use the plot figure's handle 'hplot' and clear it first
         figure(hplot);
+        axes(hplot);
         cla;
         Model.plotModel(FitResultsVox, dataVox);
         
