@@ -191,7 +191,7 @@ end
             %  convert fitted vector xopt to a structure.
             %FitResults = cell2struct(mat2cell(xopt(:),ones(length(xopt),%1)),obj.xnames,1);
             %FitResults.resnorm=resnorm;
-            
+             
         end
         
         
@@ -208,6 +208,7 @@ end
             [Tvec,Iorder] = sort(Tvec);
             
             % Plot Fitted Model
+            clf;
             plot(Tvec,Smodel(Iorder),'b-')
             title(sprintf('T2 Fit: T2=%0.4f ms; M0=%0.0f;',FitResults.T2,FitResults.M0),'FontSize',14);
             xlabel('Echo time [ms]','FontSize',12);
